@@ -2,15 +2,20 @@
 
 {% block content %}
 
-    <form action="" method="post">
-        <div class="form-group">
+    <form action="" method="post" class="form">
+        <div class="form-group mb-3">
             <label for="url">URL</label>
             <input type="text" name="url" id="url"
             placeholder="URL to shorten" class="form-control" autofocus>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
             <input type="submit" class="btn btn-primary" value="Short">
         </div>
     </form>
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
 
 {% endblock %}
