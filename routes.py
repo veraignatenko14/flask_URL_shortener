@@ -1,5 +1,11 @@
-from app import app, hashid
+from app import app, hashid, login
 from flask import render_template, request, redirect, url_for, flash
+from models import User, Url
+
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(id)
 
 
 @app.route('/', methods=['GET', 'POST'])
