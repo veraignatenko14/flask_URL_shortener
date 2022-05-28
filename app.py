@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 app.config.from_object(Config)  # подключаю конфигурационный файл к сайту
 db = SQLAlchemy(app)  # "дружу" базу данных с сайтом
+migrate = Migrate(app, db)  # учу БД регистрировать изменения в своей структуре
 hashid = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 
 from routes import *
