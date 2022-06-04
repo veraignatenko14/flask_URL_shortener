@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1 class="text-center">Sign in</h1>
+    <div class="alert alert-info">
+        Новый пользователь? <a href="{{ url_for('register') }}">Зарегистрируйтесь!</a>
+    </div>
+
+    <form class="form" action="" method="post" novalidate>
+        {{ form.hidden_tag() }}  <!-- вшиваю secret key в форму, чтобы сайт знал, откуда пришли данные -->
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.remember_me(class="form-check-input") }} {{ form.remember_me.label(class="form-check-label") }}
+        </div>
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+{% endblock %}
