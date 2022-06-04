@@ -1,6 +1,7 @@
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from hashlib import md5
 
 
 class User(UserMixin, db.Model):
@@ -15,6 +16,11 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+    def avatar(self, size):
+        digs = md5(self.email.encode('utf-8')).hexdigest()  # превращаем email пользователя в hash
+        avatar = f'https://gravatar.com/avatar/{digs}?d=identicon&s={size}'
+        return avatar
 
 
 class Url(db.Model):
