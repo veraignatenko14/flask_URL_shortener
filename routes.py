@@ -21,8 +21,8 @@ def index():
         hash_link = hashlib.sha256(bytes(url, 'ascii'))
         new_url = Url(
             original_url=url,
-            short_url=hash_link.hexdigest(),
-            user_id=1
+            short_url=hash_link.hexdigest()[:5],
+            user_id=current_user.id  # привязываем сокращенную ссылку к пользователю
         )
         db.session.add(new_url)
         db.session.commit()
@@ -72,4 +72,5 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+    urls = Url.query.filter_by(user_id=user.id)
+    return render_template('user.html', user=user, urls=urls)

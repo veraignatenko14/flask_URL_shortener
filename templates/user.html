@@ -4,4 +4,8 @@
     <img src="{{ user.avatar(128) }}" alt="{{ user.username }}-avatar">
     <h1>User: {{ user.username }}</h1>
     <hr>
+    {% for url in urls %}
+        <p>http://127.0.0.1:5000/{{ url.short_url }}</p>
+    {% endfor %}
+
 {% endblock %}
