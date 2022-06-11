@@ -19,7 +19,7 @@
                     <td>
                         <a href="{{ request.host_url }}{{ url.short_url }}" target="_blank">
                             {{ request.host_url }}{{ url.short_url }}
-                        </a>
+                        </a> <a href="update-url/{{ url.short_url }}" class="btn btn-warning"> <i class="bi bi-pencil-square"></i> </a>
                     </td>
                     <td>{{ url.original_url }}</td>
                     <td>{{ url.clicks }}</td>

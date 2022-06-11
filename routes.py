@@ -2,7 +2,7 @@ from app import app, hashid, login, db
 from flask import render_template, request, redirect, url_for, flash
 from models import User, Url
 from flask_login import current_user, login_user, logout_user, login_required
-from forms import LoginForm, RegistrationForm
+from forms import LoginForm, RegistrationForm, UpdateUrlForm
 
 
 @login.user_loader
@@ -83,3 +83,17 @@ def redirect_to(short_url):
     url.clicks += 1
     db.session.commit()  # применить изменения в базе
     return redirect(url.original_url)
+
+
+@app.route('/update-url/<short_url>', methods=['GET', 'POST'])
+@login_required
+def update_url(short_url):
+    url = Url.query.filter_by(short_url=short_url).first_or_404()
+    form = UpdateUrlForm()
+    if form.validate_on_submit():
+        url.short_url = form.url.data
+        db.session.commit()
+        return redirect(url_for('user'))
+    elif request.method == 'GET':  # если на страницу просто зашли
+        form.url.data = url.short_url  # вписываю в поле URL текущее значение сокращенной ссылки
+    return render_template('update_url.html', form=form)

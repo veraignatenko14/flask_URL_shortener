@@ -30,3 +30,8 @@ class RegistrationForm(FlaskForm):  # форма регистрации на о�
         user = User.query.filter_by(email=email.data)
         if user is not None:  # если пользователь есть в БД
             raise ValidationError('Пользователь с такой почтой уже зарегистрирован!')
+
+
+class UpdateUrlForm(FlaskForm):
+    url = StringField('URL: ')
+    submit = SubmitField('Обновить')
