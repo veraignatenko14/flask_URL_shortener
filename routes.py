@@ -1,4 +1,3 @@
-import hashlib
 from app import app, hashid, login, db
 from flask import render_template, request, redirect, url_for, flash
 from models import User, Url
@@ -13,15 +12,17 @@ def load_user(id):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    urls = Url.query.all()
     if request.method == 'POST':  # если форма отправляется
         url = request.form['url']  # сохраняю урл из формы в переменную
+        url_id = urls[-1].id + 1  # id самой последней ссылки в БД + 1
         if not url:  # если поле передали пустым
             flash('The URL is required!')
             return redirect(url_for('index'))
-        hash_link = hashlib.sha256(bytes(url, 'ascii'))
+        hash_link = hashid.encode(url_id)
         new_url = Url(
             original_url=url,
-            short_url=hash_link.hexdigest()[:5],
+            short_url=hash_link,
             user_id=current_user.id  # привязываем сокращенную ссылку к пользователю
         )
         db.session.add(new_url)
