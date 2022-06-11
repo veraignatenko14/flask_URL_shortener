@@ -91,9 +91,8 @@ def update_url(short_url):
     url = Url.query.filter_by(short_url=short_url).first_or_404()
     form = UpdateUrlForm()
     if form.validate_on_submit():
-        url.short_url = form.url.data
-        db.session.commit()
-        return redirect(url_for('user'))
+        # TODO: Починить перенаправление на главную страницу
+        return None
     elif request.method == 'GET':  # если на страницу просто зашли
         form.url.data = url.short_url  # вписываю в поле URL текущее значение сокращенной ссылки
     return render_template('update_url.html', form=form)
