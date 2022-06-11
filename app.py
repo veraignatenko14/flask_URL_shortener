@@ -15,4 +15,4 @@ hashid = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 from routes import *
 
 if __name__ == '__main__':
-    app.run(adress='0.0.0.0')
+    app.run(address='0.0.0.0')

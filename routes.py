@@ -74,3 +74,11 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     urls = Url.query.filter_by(user_id=user.id)
     return render_template('user.html', user=user, urls=urls)
+
+
+@app.route('/<short_url>')
+def redirect_to(short_url):
+    url = Url.query.filter_by(short_url=short_url).first_or_404()
+    url.clicks += 1
+    db.session.commit()  # применить изменения в базе
+    return redirect(url.original_url)
