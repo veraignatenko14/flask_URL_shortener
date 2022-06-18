@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for, flash
 from models import User, Url
 from flask_login import current_user, login_user, logout_user, login_required
 from forms import LoginForm, RegistrationForm, UpdateUrlForm
+from wtforms.validators import ValidationError
 
 
 @login.user_loader
@@ -17,7 +18,7 @@ def index():
         url = request.form['url']  # сохраняю урл из формы в переменную
         url_id = urls[-1].id + 1  # id самой последней ссылки в БД + 1
         if not url:  # если поле передали пустым
-            flash('The URL is required!')
+            flash('Нужна ссылка!', 'warning')
             return redirect(url_for('index'))
         hash_link = hashid.encode(url_id)
         new_url = Url(
@@ -27,6 +28,8 @@ def index():
         )
         db.session.add(new_url)
         db.session.commit()
+        flash(f'Ваш URL успешно сокращен: {request.host_url}{hash_link}', 'success')
+        flash(f'URL successfully shortened: {request.host_url}{hash_link}', 'success')
         return render_template('index.html')
     return render_template('index.html')
 
@@ -42,6 +45,7 @@ def login():
             # если пользователь не найден в БД или пароль не совпал
             return redirect(url_for('login'))  # вернуть пользователя на страницу входа
         login_user(user, remember=form.remember_me.data)
+        flash('Logged in!', 'info')
         return redirect(url_for('index'))
     return render_template('login.html', title='Login page', form=form)
 
@@ -58,14 +62,20 @@ def register():
         return redirect(url_for('index'))  # перенаправим на главную
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(
-            username=form.username.data,
-            email=form.email.data
-        )
-        user.set_password(form.password.data)
-        db.session.add(user)  # добавить пользователя в БД
-        db.session.commit()  # сохранить пользователя в БД
-        return redirect(url_for('login'))  # перенаправить на страницу входа
+        try:
+            form.check_username(form.username)
+            form.check_email(form.email)
+            user = User(
+                username=form.username.data,
+                email=form.email.data
+            )
+            user.set_password(form.password.data)
+            db.session.add(user)  # добавить пользователя в БД
+            db.session.commit()  # сохранить пользователя в БД
+            return redirect(url_for('login'))  # перенаправить на страницу входа
+        except ValidationError:
+            flash('Username or email already exists!', 'danger')
+            return redirect(url_for('register'))
     return render_template('register.html', form=form)
 
 
@@ -86,13 +96,15 @@ def redirect_to(short_url):
 
 
 @app.route('/update-url/<short_url>', methods=['GET', 'POST'])
-@login_required
 def update_url(short_url):
     url = Url.query.filter_by(short_url=short_url).first_or_404()
     form = UpdateUrlForm()
     if form.validate_on_submit():
-        # TODO: Починить перенаправление на главную страницу
-        return None
-    elif request.method == 'GET':  # если на страницу просто зашли
-        form.url.data = url.short_url  # вписываю в поле URL текущее значение сокращенной ссылки
+        url.short_url = form.url.data
+        try:
+            db.session.commit()
+        except:
+            return 'There was a problem updating data'
+        flash(f'URL successfully changed: {request.host_url}{url.short_url}', 'success')
+        return redirect(url_for('index')) # вписываю в поле URL текущее значение сокращенной ссылки
     return render_template('update_url.html', form=form)
